@@ -6,13 +6,26 @@ export default class Carousel {
     this.createSlides();
     this.addProductSlides();
     this.initCarousel();
+    this.addToCart();
     this.test();
   }
-  // let currentIndexSlideNumber;
 
   createSlides() {
-    let productSlide = createElement(`
-    
+    let slides = this.slides
+      .map((item, index) =>
+        `<div class="carousel__slide" data-id=${this.slides[index].id}>
+          <img src="/assets/images/carousel/${this.slides[index].image}" class="carousel__img" alt="slide">
+          <div class="carousel__caption">
+            <span class="carousel__price">€${this.slides[index].price.toFixed(2)}</span>
+            <div class="carousel__title">${this.slides[index].name}</div>
+            <button type="button" class="carousel__button">
+              <img src="/assets/images/icons/plus-icon.svg" alt="icon">
+            </button>
+          </div>
+        </div>`)
+      .join('');
+
+    let productSlides = createElement(`
     <div class="carousel">
       <div class="carousel__arrow carousel__arrow_right">
         <img src="/assets/images/icons/angle-icon.svg" alt="icon">
@@ -20,57 +33,14 @@ export default class Carousel {
       <div class="carousel__arrow carousel__arrow_left">
         <img src="/assets/images/icons/angle-left-icon.svg" alt="icon">
       </div>
-     
       <div class="carousel__inner">
-      
-        <div class="carousel__slide" data-id=${this.slides[0].id}>
-          <img src="/assets/images/carousel/${this.slides[0].image}" class="carousel__img" alt="slide">
-          <div class="carousel__caption">
-            <span class="carousel__price">€${this.slides[0].price.toFixed(2)}</span>
-            <div class="carousel__title">${this.slides[0].name}</div>
-            <button type="button" class="carousel__button">
-              <img src="/assets/images/icons/plus-icon.svg" alt="icon">
-            </button>
-          </div>
-        </div>        
-        <div class="carousel__slide" data-id=${this.slides[1].id}>
-          <img src="/assets/images/carousel/${this.slides[1].image}" class="carousel__img" alt="slide">
-          <div class="carousel__caption">
-            <span class="carousel__price">€${this.slides[1].price.toFixed(2)}</span>
-            <div class="carousel__title">${this.slides[1].name}</div>
-            <button type="button" class="carousel__button carousel__button1">
-              <img src="/assets/images/icons/plus-icon.svg" alt="icon">
-            </button>
-          </div>
-        </div>
-        <div class="carousel__slide" data-id=${this.slides[2].id}>
-          <img src="/assets/images/carousel/${this.slides[2].image}" class="carousel__img" alt="slide">
-          <div class="carousel__caption">
-            <span class="carousel__price">€${this.slides[2].price.toFixed(2)}</span>
-            <div class="carousel__title">${this.slides[2].name}</div>
-            <button type="button" class="carousel__button">
-              <img src="/assets/images/icons/plus-icon.svg" alt="icon">
-            </button>
-          </div>
-        </div>
-        <div class="carousel__slide" data-id=${this.slides[0].id}>
-          <img src="/assets/images/carousel/${this.slides[0].image}" class="carousel__img" alt="slide">
-          <div class="carousel__caption">
-            <span class="carousel__price">€${this.slides[0].price.toFixed(2)}</span>
-            <div class="carousel__title">${this.slides[0].name}</div>
-            <button type="button" class="carousel__button">
-              <img src="/assets/images/icons/plus-icon.svg" alt="icon">
-            </button>
-          </div>
-        </div>
-              
-      </div>
-      
+        ${slides}
+       </div>
     </div>
-    
     `)
-    return productSlide
+    return productSlides
   }
+
   addProductSlides() {
     this.elem = this.createSlides();
   }
@@ -90,7 +60,7 @@ export default class Carousel {
 
     carouselArrowRight.onclick = () => {
       currentSlideNumber++;
-      update(); 
+      update();
     }
     carouselArrowLeft.onclick = () => {
       currentSlideNumber--;
@@ -114,31 +84,30 @@ export default class Carousel {
       }
     }
 
-    // let btnAddToCart1 = this.elem.querySelector('.carousel__button1');
-    let currenCartNumber = currentSlideNumber
-    let btnAddToCartAll = this.elem.querySelectorAll('.carousel__button');
-    // console.log(btnAddToCart[currentSlideNumber]);
-    // console.log(currentSlideNumber);
-    // console.log(this.initCarousel.currentSlideNumber);
+  }
+  addToCart() {
+    this.elem.addEventListener('click', ({ target }) => {
+      let button = target.closest('.carousel__button');
 
-    btnAddToCartAll[currenCartNumber].addEventListener('product-add', event => {
-      console.log(btnAddToCartAll[currenCartNumber]);
-      console.log(currenCartNumber);
-      console.log(this.slides[currentSlideNumber].id);
-    })
-
-    btnAddToCartAll[currenCartNumber].addEventListener('click', event => {
-      let clickEvent = new CustomEvent('product-add', {
-        detail: this.slides[currenCartNumber].id,
-        bubbles: true,
-      })
-      btnAddToCartAll[currenCartNumber].dispatchEvent(clickEvent);
-    })
-
+      if (button) {
+        let id = target.closest('[data-id]').dataset.id;
+        this.elem.dispatchEvent(new CustomEvent('product-add', {
+          detail: id,
+          bubbles: true
+        }));
+      }
+    });
   }
 
+
   test() {
-    // console.log(this.slidesObj)
+    console.log(this.elem)
+
   }
 
 }
+
+
+
+
+
