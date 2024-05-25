@@ -74,6 +74,7 @@ export default class Modal {
   }
 
 
+  
   // removeEvent(){
   //   document.removeEventListener('keydown', closeModalEscape);
   // }
