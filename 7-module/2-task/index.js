@@ -52,7 +52,7 @@ export default class Modal {
     this.modalDelete = document.body.querySelector('.modal');
     this.modalDelete.parentNode.remove();
     document.body.classList.remove('is-modal-open');
-    // this.removeEvent();
+    this.removeEvent();
   };
 
   closeBTN() {
@@ -61,22 +61,21 @@ export default class Modal {
       if (BTN) this.close();
     });
   }
+  
   closeEscape() {
     let modalDel = document.body.querySelector('.modal');
-    function closeModalEscape(ev) {
+    this.closeModalEscape = function closeModalEscape(ev) {
       if (ev.code === 'Escape') {
         modalDel.parentNode.remove();
         console.log(ev.code === 'Escape')
         document.removeEventListener('keydown', closeModalEscape);
       };
     }
-    document.addEventListener('keydown', closeModalEscape);
+    document.addEventListener('keydown', this.closeModalEscape);
   }
-
-
-  
-  // removeEvent(){
-  //   document.removeEventListener('keydown', closeModalEscape);
-  // }
+ 
+  removeEvent(){
+    document.removeEventListener('keydown', this.closeModalEscape);
+  }
 }
      
