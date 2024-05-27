@@ -2,15 +2,10 @@ export default class StepSlider {
   constructor({ steps, value = 0 }) {
     this.steps = steps;
     this.value = value;
-    
-    this.currentSteps();
+
     this.addSlider();
     this.createSliderSteps();
-    this.move();
-   
-
-    this.test();
-
+    this.configMoveSteps();
   }
 
   addSlider() {
@@ -21,7 +16,7 @@ export default class StepSlider {
 
         <!--Ползунок слайдера с активным значением-->
         <div class="slider__thumb" style="left: 50%;">
-          <span class="slider__value">${this.numberCurrentStep}</span>
+          <span class="slider__value">2</span>
         </div>
 
         <!--Заполненная часть слайдера-->
@@ -33,9 +28,8 @@ export default class StepSlider {
         </div>
 
       </div>
-      `
-
-    };
+    `
+  };
 
   createSliderSteps() {
     this.sliderSteps = this.elem.querySelector('.slider__steps')
@@ -43,123 +37,57 @@ export default class StepSlider {
 
     for (let i = 0; i < this.steps - 1; i++) {
       this.sliderSteps.insertAdjacentHTML('beforeend', '<span></span>');
-    }
+    };
+
   };
 
-  currentSteps(){
-    this.numberCurrentStep = 2;
+  configMoveSteps() {
+    this.numberCurrentStep = this.elem.querySelector('.slider__value');
+    this.sliderMove = this.elem.querySelector('.slider');
+    this.sliderStepsAll = this.elem.querySelector('.slider__steps').childNodes;
+    this.sliderStepsAll[this.numberCurrentStep.innerText].classList.add('slider__step-active')
+    this.sliderThumb = this.elem.querySelector('.slider__thumb');
+    this.sliderProgress = this.elem.querySelector('.slider__progress');
 
-    let borders = this.sliderOffsetX / this.steps
-    console.log(borders);
-
-    // this.sliderMove = this.elem.querySelector('.slider');
-    // this.sliderPositionX = this.sliderMove.offsetWidth;
-    
-    // this.sliderPositionX = of
-    // Number(this.elem.querySelector('.slider__value').innerHTML);
-
-
+    window.addEventListener('load', (ev) => {
+      this.sliderWidthX = this.sliderMove.offsetWidth;
+      this.stepWidthX = this.sliderWidthX / (this.steps - 1);
+      this.move();
+    });
   }
 
   move() {
-    this.sliderMove = this.elem.querySelector('.slider');
-
-    
-    // console.log(sliderPositionX);
-    console.log(this.sliderMove);
     this.sliderMove.addEventListener('click', (ev) => {
       let slider = ev.currentTarget.getBoundingClientRect();
       let clickX = ev.clientX - slider.left;
+      let currentStepWidthX = this.stepWidthX / 2;
 
-      this.sliderOffsetX = this.sliderMove.offsetWidth;
-      console.log(this.sliderOffsetX);
-      // let slider1 = ev.currentTarget.closest('.slider');
-      
-      this.currentSteps()
-      
-      // if(slider){
-        
-      // console.log(slider)
-      // console.log(slider1)
-      // console.log('X', ev.offsetX);
-      // console.log('Y', ev.offsetY);
-      // console.log('pageX', ev.pageX);
-      // console.log('pageY', ev.pageY);
-      // }
-      // if (slider) {
-      //   slider.slider__value;
-      // }
+      for (let i = 1; i <= this.steps; i++) {
+        if (clickX > currentStepWidthX) {
+          currentStepWidthX = currentStepWidthX + this.stepWidthX;
+        } else {
+          this.createSliderSteps();
+          this.numberCurrentStep.innerText = i;
+          if (this.sliderStepsAll[i]) this.sliderStepsAll[i - 1].classList.add('slider__step-active');
+          let leftPercents = clickX / this.sliderWidthX * 100;
+          this.sliderThumb.style.left = `${leftPercents}%`;
+          this.sliderProgress.style.width = `${leftPercents}%`;
+
+          let button = ev.target.closest('.slider');
+          if (button) {
+            this.value = i - 1;
+            this.elem.dispatchEvent(new CustomEvent('slider-change', {
+              detail: this.value,
+              bubbles: true
+            }));
+          };
+
+          break;
+        }
+      }
+
     });
-
   }
-  /* 
-
-  var rect = e.currentTarget.getBoundingClientRect(),
-      offsetX = e.clientX - rect.left,
-      offsetY = e.clientY - rect.top;
-
-
-    closeBTN() {
-      this.modal.addEventListener('click', ({ target }) => {
-        let BTN = target.closest('.modal__close');
-        if (BTN) this.close();
-      });
-    }
-  */
-
-
-
-
-  test() {
-    // console.log('this.elem:', this.elem)
-    // console.log('this.sliderPositionX :', this.sliderPositionX )
-    // console.log('this.numberCurrentStep:', this.numberCurrentStep)
-
-
-  }
-
-
-
-
-
-
 
 }
-
-
-
-
-/* 
-
-   // }
-    // this.test = "<div>alert('Я Джон в раздражающем alert!')</div>";
-    // return this.test.innerHTML  // 
-
-
-    // return '<div></div>'
-    /* 
-
-        <div class="slider__steps">
-          <span></span>
-          <span></span>
-          <span class="slider__step-active"></span>
-          <span></span>
-          <span></span>
-        </div>
-
-
-
-  
-    add() {
-    this.elem = document.createElement('TABLE')
-    this.elem.innerHTML = this.rows
-      .map(({ name, age, salary, city }) =>
-        `<tr>
-          <td>${name}</td><td>${age}</td><td>${salary}</td><td>${city}</td><td><button>X</button></td>
-        </tr>`)
-      .join('');
-
-    this.user
-  }
- */
 

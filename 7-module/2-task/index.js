@@ -2,7 +2,7 @@ import createElement from '../../assets/lib/create-element.js';
 
 export default class Modal {
   constructor() {
-
+    this.createModal();
   }
 
   open() {
@@ -25,7 +25,6 @@ export default class Modal {
           </button>
   
           <h3 class="modal__title">
-          ${this.modalTitle}
           </h3>
         </div>
         <div class="modal__body">
@@ -38,8 +37,7 @@ export default class Modal {
   }
 
   setTitle(modalTitle) {
-    this.modalTitle = modalTitle
-    this.createModal();
+    this.modal.querySelector('.modal__title').textContent = modalTitle;
   };
 
   setBody(nodeBody) {
@@ -49,8 +47,7 @@ export default class Modal {
   };
 
   close() {
-    this.modalDelete = document.body.querySelector('.modal');
-    this.modalDelete.parentNode.remove();
+    this.modal.remove();
     document.body.classList.remove('is-modal-open');
     this.removeEvent();
   };
@@ -63,12 +60,10 @@ export default class Modal {
   }
   
   closeEscape() {
-    let modalDel = document.body.querySelector('.modal');
-    this.closeModalEscape = function closeModalEscape(ev) {
+    this.closeModalEscape = (ev)  => {
       if (ev.code === 'Escape') {
-        modalDel.parentNode.remove();
-        console.log(ev.code === 'Escape')
-        document.removeEventListener('keydown', closeModalEscape);
+        ev.preventDefault();
+        this.close();
       };
     }
     document.addEventListener('keydown', this.closeModalEscape);
