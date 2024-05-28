@@ -1,11 +1,13 @@
 export default class StepSlider {
   constructor({ steps, value = 0 }) {
+    
     this.steps = steps;
     this.value = value;
 
     this.addSlider();
     this.createSliderSteps();
-    this.configMoveSteps();
+    this.configSliderValue();
+    this.configSteps();
   }
 
   addSlider() {
@@ -16,7 +18,7 @@ export default class StepSlider {
 
         <!--Ползунок слайдера с активным значением-->
         <div class="slider__thumb" style="left: 50%;">
-          <span class="slider__value">2</span>
+          <span class="slider__value"></span>
         </div>
 
         <!--Заполненная часть слайдера-->
@@ -40,54 +42,74 @@ export default class StepSlider {
     };
 
   };
+  configSliderValue() {
+    this.slider = this.elem.querySelector('.slider');
+    this.sliderValue = this.elem.querySelector('.slider__value');
+    this.sliderValue.textContent = this.value;
 
-  configMoveSteps() {
-    this.numberCurrentStep = this.elem.querySelector('.slider__value');
-    this.sliderMove = this.elem.querySelector('.slider');
-    this.sliderStepsAll = this.elem.querySelector('.slider__steps').childNodes;
-    this.sliderStepsAll[this.numberCurrentStep.innerText].classList.add('slider__step-active')
     this.sliderThumb = this.elem.querySelector('.slider__thumb');
     this.sliderProgress = this.elem.querySelector('.slider__progress');
+  };
+
+  configSteps() {
+    this.sliderStepsAll = this.elem.querySelector('.slider__steps').childNodes;
+    this.sliderStepsAll[this.sliderValue.innerText]
+      .classList.add('slider__step-active')
 
     window.addEventListener('load', (ev) => {
-      this.sliderWidthX = this.sliderMove.offsetWidth;
-      this.stepWidthX = this.sliderWidthX / (this.steps - 1);
+      this.sliderWidthPX = this.slider.offsetWidth;
+      this.stepWidthPX = this.sliderWidthPX / (this.steps - 1);
+
       this.move();
     });
   }
 
   move() {
-    this.sliderMove.addEventListener('click', (ev) => {
-      let slider = ev.currentTarget.getBoundingClientRect();
-      let clickX = ev.clientX - slider.left;
-      let currentStepWidthX = this.stepWidthX / 2;
+    this.slider.addEventListener('click', (ev) => {
+      let sliderX = ev.currentTarget.getBoundingClientRect();
+      this.clickX = ev.clientX - sliderX.left;
+      let currentStepWidthX = this.stepWidthPX;
 
-      for (let i = 1; i <= this.steps; i++) {
-        if (clickX > currentStepWidthX) {
-          currentStepWidthX = currentStepWidthX + this.stepWidthX;
+      for (let i = 1; i < this.steps; i++) {
+        if (this.clickX > currentStepWidthX) {
+          currentStepWidthX = currentStepWidthX + this.stepWidthPX;
         } else {
-          this.createSliderSteps();
-          this.numberCurrentStep.innerText = i;
-          if (this.sliderStepsAll[i]) this.sliderStepsAll[i - 1].classList.add('slider__step-active');
-          let leftPercents = clickX / this.sliderWidthX * 100;
-          this.sliderThumb.style.left = `${leftPercents}%`;
-          this.sliderProgress.style.width = `${leftPercents}%`;
+          this.value = i
+          
+          this.createSliderSteps(); // this.removeClassSteps();
 
-          let button = ev.target.closest('.slider');
-          if (button) {
-            this.value = i - 1;
-            this.elem.dispatchEvent(new CustomEvent('slider-change', {
-              detail: this.value,
-              bubbles: true
-            }));
-          };
+          this.updateSliderData();
 
+          this.updateSliderStyle();
+          
+          this.sliderChange = ev.target.closest('.slider');
+          if (sliderChange) this.sendDataServer();
+          
           break;
         }
       }
-
     });
   }
+  removeClassSteps() {
+
+  };
+  updateSliderData() {
+    this.sliderValue.innerText = this.value;
+    this.sliderStepsAll[this.value].classList.add('slider__step-active');
+  };
+  updateSliderStyle() {
+
+
+    this.leftPercents = this.clickX / this.sliderWidthPX * 100;
+    this.sliderThumb.style.left = `${this.leftPercents}%`;
+    this.sliderProgress.style.width = `${this.leftPercents}%`;
+  };
+  sendDataServer(){
+    this.elem.dispatchEvent(new CustomEvent('slider-change', {
+      detail: this.value,
+      bubbles: true
+    }));
+
+  };
 
 }
-
