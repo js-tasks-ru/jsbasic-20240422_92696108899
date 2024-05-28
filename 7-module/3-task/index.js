@@ -1,115 +1,64 @@
+import createElement from '../../assets/lib/create-element.js';
+
 export default class StepSlider {
   constructor({ steps, value = 0 }) {
-    
+
     this.steps = steps;
     this.value = value;
 
-    this.addSlider();
-    this.createSliderSteps();
-    this.configSliderValue();
-    this.configSteps();
+    this.render();
+    this.move();
   }
 
-  addSlider() {
-    this.elem = document.createElement('div');
-    this.elem.innerHTML =
-      `
-      <div class="slider">
+  render() {
+    this.elem = createElement(`
+       <div class="slider">
+         <div class="slider__thumb">
+           <span class="slider__value"></span>
+         </div>
+         <div class="slider__progress"></div>
+         <div class="slider__steps">
+           ${'<span></span>'.repeat(this.steps)}
+         </div>
+       </div>
+     `);
 
-        <!--Ползунок слайдера с активным значением-->
-        <div class="slider__thumb" style="left: 50%;">
-          <span class="slider__value"></span>
-        </div>
+    this.elem.querySelector('.slider__steps')
+      .children[this.value].classList.add('slider__step-active');
 
-        <!--Заполненная часть слайдера-->
-        <div class="slider__progress" style="width: 50%;"></div>
-
-        <!--Шаги слайдера-->
-        <div class="slider__steps">
-          ${this.sliderSteps}
-        </div>
-
-      </div>
-    `
+    this.elem.querySelector('.slider__value').textContent = this.value;
   };
-
-  createSliderSteps() {
-    this.sliderSteps = this.elem.querySelector('.slider__steps')
-    this.sliderSteps.innerHTML = '<span></span>';
-
-    for (let i = 0; i < this.steps - 1; i++) {
-      this.sliderSteps.insertAdjacentHTML('beforeend', '<span></span>');
-    };
-
-  };
-  configSliderValue() {
-    this.slider = this.elem.querySelector('.slider');
-    this.sliderValue = this.elem.querySelector('.slider__value');
-    this.sliderValue.textContent = this.value;
-
-    this.sliderThumb = this.elem.querySelector('.slider__thumb');
-    this.sliderProgress = this.elem.querySelector('.slider__progress');
-  };
-
-  configSteps() {
-    this.sliderStepsAll = this.elem.querySelector('.slider__steps').childNodes;
-    this.sliderStepsAll[this.sliderValue.innerText]
-      .classList.add('slider__step-active')
-
-    window.addEventListener('load', (ev) => {
-      this.sliderWidthPX = this.slider.offsetWidth;
-      this.stepWidthPX = this.sliderWidthPX / (this.steps - 1);
-
-      this.move();
-    });
-  }
 
   move() {
-    this.slider.addEventListener('click', (ev) => {
-      let sliderX = ev.currentTarget.getBoundingClientRect();
-      this.clickX = ev.clientX - sliderX.left;
-      let currentStepWidthX = this.stepWidthPX;
+    this.elem.addEventListener('click', (ev) => {
 
-      for (let i = 1; i < this.steps; i++) {
-        if (this.clickX > currentStepWidthX) {
-          currentStepWidthX = currentStepWidthX + this.stepWidthPX;
-        } else {
-          this.value = i
-          
-          this.createSliderSteps(); // this.removeClassSteps();
+      let newLeft = (ev.clientX - this.elem.getBoundingClientRect().left) / this.elem.offsetWidth;
+      this.value = Math.round((this.steps - 1) * newLeft);
+      let valuePercents = (this.value / (this.steps - 1)) * 100;
 
-          this.updateSliderData();
+      this.elem.querySelector('.slider__thumb').style.left = `${valuePercents}%`;
+      this.elem.querySelector('.slider__progress').style.width = `${valuePercents}%`;
 
-          this.updateSliderStyle();
-          
-          this.sliderChange = ev.target.closest('.slider');
-          if (sliderChange) this.sendDataServer();
-          
-          break;
-        }
-      }
+      this.elem.querySelector('.slider__value').innerHTML = this.value;
+
+      this.updateSliderStyle();
+
+      this.sendDataServer();
     });
   }
-  removeClassSteps() {
 
-  };
-  updateSliderData() {
-    this.sliderValue.innerText = this.value;
-    this.sliderStepsAll[this.value].classList.add('slider__step-active');
-  };
   updateSliderStyle() {
+    if (this.elem.querySelector('.slider__step-active')) {
+      this.elem.querySelector('.slider__step-active').classList.remove('slider__step-active');
+    }
 
-
-    this.leftPercents = this.clickX / this.sliderWidthPX * 100;
-    this.sliderThumb.style.left = `${this.leftPercents}%`;
-    this.sliderProgress.style.width = `${this.leftPercents}%`;
+    this.elem.querySelector('.slider__steps').children[this.value].classList.add('slider__step-active');
   };
-  sendDataServer(){
+
+  sendDataServer() {
     this.elem.dispatchEvent(new CustomEvent('slider-change', {
       detail: this.value,
       bubbles: true
     }));
-
   };
-
 }
