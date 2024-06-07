@@ -33,7 +33,6 @@ export default class ProductCard {
 
   addToCart() {
     let btnAddToCart = this.elem.querySelector('.card__button');
-    console.log(btnAddToCart);
     btnAddToCart.addEventListener('product-add', event => {
 
     })

@@ -66,7 +66,7 @@ export default class StepSlider {
         this.elem.addEventListener('pointermove', this.onMousemove);
       } // END if (mousedownEvent.target.closest('.slider__thumb')
 
-      this.onMouseUp = document.addEventListener('pointerup', (mouseUpEvent) => {
+      let onMouseUp = (mouseUpEvent) => {
         this.elem.classList.remove('slider_dragging');
 
         let newLeft = (mouseUpEvent.clientX - this.elem.getBoundingClientRect().left) / this.elem.offsetWidth;
@@ -76,14 +76,13 @@ export default class StepSlider {
         this.valuePercents = (this.value / (this.steps - 1)) * 100;
         if (mousedownEvent.target.closest('.slider__thumb')) {
           this.elem.removeEventListener('pointermove', this.onMousemove);
-          this.elem.removeEventListener('pointerup', this.onMouseUp);
-          document.removeEventListener('pointerup', this.onMouseUp);
-          this.onMouseUp = null;
+          document.removeEventListener('pointerup', onMouseUp);
 
           this.updateSliderStyle();
           this.sendDataServer();
         }
-      });
+      }
+      document.addEventListener('pointerup', onMouseUp);
     })
   };
 
