@@ -61,23 +61,3 @@ export default class ProductGrid {
   }
 }
 
-/* 
-  {
-    name: "Som tam papaya salad",
-    price: 9.5,
-    category: "salads",
-    image: "som_tam_papaya_salad.png",
-    id: "som-tam-papaya-salad",
-    spiciness: 0
-  },
-
-let filters = {
-noNuts: true, // true/false         = >  products[i].nuts == false
-vegeterianOnly: true, // true/false = >  products[i].vegeterian == true
-maxSpiciness: 3, // числа от 0 до 4 = >  products[i].spiciness <= filters.maxSpiciness
-category: 'soups' // ID категории   = >  products[i].category === filters.category 
-};
-
-
-*/
-
