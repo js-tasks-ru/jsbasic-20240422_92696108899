@@ -142,7 +142,7 @@ export default class Cart {
         if (!this.cartItems.length) this.modalWindow.close();
       }
     });
-    // 
+
     this.sendDataForm = this.modalBody.querySelector('.cart-form');
     this.sendDataForm.addEventListener('submit', (ev) => {
       if (ev.target.closest('.cart-form')) this.onSubmit(ev);
@@ -172,30 +172,41 @@ export default class Cart {
 
   onSubmit(event) {
     event.preventDefault();
-    
+
     let btn = this.modalBody.querySelector('button[type="submit"]');
     btn.classList.add('is-loading')
- 
+
+    let controller = new AbortController();
+    let signal = controller.signal;
+
     let fd = new FormData(this.sendDataForm);
     fetch('https://httpbin.org/post', {
       method: 'POST',
       body: fd,
     })
+
       .then(response => {
+
         if (response.ok) {
           this.modalWindow.setTitle(`Success!`);
           this.cartItems = []
           this.modalWindow.setBody(createElement(`
-            <div class="modal__body-inner">
-              <p>
-                Order successful! Your order is being cooked :) <br>
-                We’ll notify you about delivery time shortly.<br>
-                <img src="/assets/images/delivery.gif">
-              </p>
-            </div>
-            `));
+             <div class="modal__body-inner">
+               <p>
+                 Order successful! Your order is being cooked :) <br>
+                 We’ll notify you about delivery time shortly.<br>
+                 <img src="/assets/images/delivery.gif">
+               </p>
+             </div>
+             `));
         }
-        return response.json()
+        if (!response.ok) {
+          throw new Error()
+        }
+        return response.json();
+      })
+      .catch((err) => {
+        console.log(err)
       })
   };
 
