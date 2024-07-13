@@ -20,8 +20,7 @@ export default class Cart {
       }
 
     }
-    console.log(this.cartItems)
-    console.log(this.cartIcon)
+   
   };
 
   updateProductCount(productId, amount) {
@@ -36,8 +35,6 @@ export default class Cart {
       }
     }
     this.onProductUpdate(this.cartItems[cartItemIndex])
-    // console.log(this.cartItems)
-
   }
 
   isEmpty() {
