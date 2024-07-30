@@ -49,6 +49,7 @@ export default class CartIcon {
       
       if (window.scrollY > topCoord) {
         this.elem.style.position = 'fixed';
+        this.elem.style.zIndex = '100';
         this.elem.style.top = '50px';
         this.elem.style.left = shiftLeft + 'px';
       } else  {

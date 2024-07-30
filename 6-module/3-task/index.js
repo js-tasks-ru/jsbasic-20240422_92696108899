@@ -7,7 +7,6 @@ export default class Carousel {
     this.addProductSlides();
     this.initCarousel();
     this.addToCart();
-    this.test();
   }
 
   createSlides() {
@@ -53,9 +52,6 @@ export default class Carousel {
     let carouselArrowRight = this.elem.querySelector('.carousel__arrow_right');
     let carouselArrowLeft = this.elem.querySelector('.carousel__arrow_left');
 
-    // let carousel = this.elem.querySelector('.carousel');
-    // console.log(carousel);
-
     update();
 
     carouselArrowRight.onclick = () => {
@@ -97,12 +93,6 @@ export default class Carousel {
         }));
       }
     });
-  }
-
-
-  test() {
-    console.log(this.elem)
-
   }
 
 }

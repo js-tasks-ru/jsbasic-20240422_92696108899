@@ -13,6 +13,7 @@ export default class Cart {
   }
 
   addProduct(product) {
+
     if (product) {
       let cartItemIndex = this.cartItems.indexOf(
         this.cartItems.find(item => item.product.id === product.id));
@@ -26,6 +27,7 @@ export default class Cart {
       }
 
     }
+
   }
 
   updateProductCount(productId, amount) {
@@ -170,26 +172,21 @@ export default class Cart {
     };
   }
 
-  onSubmit(event) {
+
+  async onSubmit(event) {
     event.preventDefault();
 
-    let btn = this.modalBody.querySelector('button[type="submit"]');
-    btn.classList.add('is-loading')
-
-    let controller = new AbortController();
-    let signal = controller.signal;
+    this.modalBody
+      .querySelector('button[type="submit"]')
+      .classList.add('is-loading');
 
     let fd = new FormData(this.sendDataForm);
-    fetch('https://httpbin.org/post', {
-      method: 'POST',
-      body: fd,
-    })
-
+    await fetch('https://httpbin.org/post', { method: 'POST', body: fd, })
       .then(response => {
-
         if (response.ok) {
           this.modalWindow.setTitle(`Success!`);
           this.cartItems = []
+          this.cartIcon.update(this);
           this.modalWindow.setBody(createElement(`
              <div class="modal__body-inner">
                <p>
@@ -206,9 +203,42 @@ export default class Cart {
         return response.json();
       })
       .catch((err) => {
-        console.log(err)
+        // console.log(err)
       })
   };
+
+  /* 
+    async onSubmit(event) {
+      event.preventDefault();
+  
+      this.modalBody
+        .querySelector('button[type="submit"]')
+        .classList.add("is-loading");
+      let form = this.modalBody.querySelector('.cart-form');
+      let userData = new FormData(form);
+  
+      await fetch('https://httpbin.org/post', { method: 'POST', body: userData });
+  
+      this.modal.setTitle("Success!");
+      this.modalBody
+        .querySelector('button[type="submit"]')
+        .classList.remove("is-loading");
+  
+      this.cartItems = [];
+      this.cartIcon.update(this);
+  
+      this.modalBody.innerHTML = `
+        <div class="modal__body-inner">
+          <p>
+            Order successful! Your order is being cooked :) <br>
+            We’ll notify you about delivery time shortly.<br>
+            <img src="/assets/images/delivery.gif">
+          </p>
+        </div>
+        `;
+    };
+  
+   */
 
   addEventListeners() {
     this.cartIcon.elem.onclick = () => this.renderModal();
