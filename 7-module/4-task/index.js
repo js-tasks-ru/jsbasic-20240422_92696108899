@@ -1,7 +1,7 @@
 import createElement from '../../assets/lib/create-element.js';
 
 export default class StepSlider {
-  constructor({ steps, value = 0 }) {
+  constructor({ steps, value = 3 }) {
 
     this.steps = steps;
     this.value = value;
@@ -23,24 +23,29 @@ export default class StepSlider {
        </div>
      `);
 
-    this.elem.querySelector('.slider__steps')
-      .children[this.value].classList.add('slider__step-active');
+    this.sliderSteps = this.elem.querySelector('.slider__steps');
+    this.sliderValue = this.elem.querySelector('.slider__value');
+    this.sliderThumb = this.elem.querySelector('.slider__thumb');
+    this.sliderProgress = this.elem.querySelector('.slider__progress');
 
-    this.elem.querySelector('.slider__value').textContent = this.value;
+    this.sliderSteps.children[this.value].classList.add('slider__step-active');
+    this.sliderValue.textContent = this.value;
+
+    this.updateSliderStyle();
   };
-  // У вас не было обработчика на событие click-а
+
   onClick = (event) => {
     let newLeft = (event.clientX - this.elem.getBoundingClientRect().left) / this.elem.offsetWidth;
 
     this.value = Math.round((this.steps - 1) * newLeft);
+    // 
     this.valuePercents = (this.value / (this.steps - 1)) * 100;
+    // 
     this.updateSliderStyle();
     this.sendDataServer();
   }
 
   move() {
-    this.sliderThumb = this.elem.querySelector('.slider__thumb');
-    this.sliderProgress = this.elem.querySelector('.slider__progress');
     this.sliderThumb.ondragstart = () => false;
     this.elem.onclick = this.onClick;
 
@@ -73,6 +78,7 @@ export default class StepSlider {
         if (newLeft > 1) newLeft = 1;
         if (newLeft < 0) newLeft = 0;
         this.value = Math.round((this.steps - 1) * newLeft);
+
         this.valuePercents = (this.value / (this.steps - 1)) * 100;
         if (mousedownEvent.target.closest('.slider__thumb')) {
           this.elem.removeEventListener('pointermove', this.onMousemove);
@@ -87,15 +93,15 @@ export default class StepSlider {
   };
 
   updateSliderStyle() {
-    this.elem.querySelector('.slider__thumb').style.left = `${this.valuePercents}%`;
-    this.elem.querySelector('.slider__progress').style.width = `${this.valuePercents}%`;
-    this.elem.querySelector('.slider__value').innerHTML = this.value;
+    this.valuePercents = (this.value / (this.steps - 1)) * 100;
+    this.sliderThumb.style.left = `${this.valuePercents}%`;
+    this.sliderProgress.style.width = `${this.valuePercents}%`;
+    this.sliderValue.innerHTML = this.value;
 
     if (this.elem.querySelector('.slider__step-active')) {
       this.elem.querySelector('.slider__step-active').classList.remove('slider__step-active');
     }
     this.elem.querySelector('.slider__steps').children[this.value].classList.add('slider__step-active');
-    // this.elem.removeEventListener('pointerup', this.onMouseUp);
   };
 
   sendDataServer() {
